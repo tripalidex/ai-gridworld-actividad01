@@ -47,14 +47,14 @@ class MiAgente(Agente):
 
     def __init__(self):
         super().__init__(nombre="Mi Agente")
-        # Puedes agregar atributos aquí si los necesitas.
-        # Ejemplo:
-        #   self.pasos = 0
-        #   self.memoria = {}
+        # Estado interno (memoria): un diccionario para contar cuántas veces hemos visitado cada celda
+        self.conteo_visitas = {}
 
     def al_iniciar(self):
         """Se llama una vez al iniciar la simulación. Opcional."""
         pass
+        # Inicializamos el conteo de visitas aquí para asegurarnos de que se reinicie cada vez que se ejecute la simulación.
+        self.conteo_visitas = {}
 
     def decidir(self, percepcion):
         
