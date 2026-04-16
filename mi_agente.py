@@ -33,6 +33,7 @@ Valores posibles de cada dirección:
 Si tu agente retorna un movimiento inválido (hacia pared o
 fuera del mapa), simplemente se queda en su lugar.
 """
+import random
 
 from entorno import Agente
 
@@ -88,36 +89,33 @@ class MiAgente(Agente):
         return utilidad
 
     def decidir(self, percepcion):
+        # Actualizamos nuestro estado interno (memoria)
+        pos_actual = percepcion['posicion']
         
-        """
-        Decide la siguiente acción del agente.
-        
-        Parámetros:
-            percepcion – diccionario con lo que el agente puede ver
+        # Si la celda no existe en el diccionario, empieza en 0 y le suma 1. 
+        # Si ya existe, toma su valor actual y le suma 1.
+        self.conteo_visitas[pos_actual] = self.conteo_visitas.get(pos_actual, 0) + 1
 
-        Retorna:
-            'arriba', 'abajo', 'izquierda' o 'derecha'
-        """
-        # ╔══════════════════════════════════════╗
-        # ║   ESCRIBE TU LÓGICA AQUÍ             ║
-        # ╚══════════════════════════════════════╝
+        mejores_acciones = []
+        max_utilidad = -float('inf')  # Empezamos con la peor utilidad posible
 
-        # Ejemplo básico (bórralo y escribe tu propia lógica):
-        #
-        # vert, horiz = percepcion['direccion_meta']
-        #
-        # if percepcion[vert] == 'libre' or percepcion[vert] == 'meta':
-        #     return vert
-        # if percepcion[horiz] == 'libre' or percepcion[horiz] == 'meta':
-        #     return horiz
-        #
-        # return 'abajo'
-        print('Hola decidir')
-        for direccion in self.ACCIONES:
-            celda = percepcion[direccion]
-            if celda == 'meta':
-                return direccion
-            if celda == 'libre':
-                return direccion
+        # El agente evalúa las 4 acciones posibles y calcula su utilidad
+        for accion in self.ACCIONES:
+            utilidad_actual = self.calcular_utilidad(accion, percepcion, pos_actual)
 
-        return 'abajo'  # ← Reemplazar con tu lógica
+            # Si encontramos una acción mejor, actualizamos el récord
+            if utilidad_actual > max_utilidad:
+                max_utilidad = utilidad_actual
+                mejores_acciones = [accion]  # Reiniciamos la lista con la nueva mejor opción
+            
+            # Si hay un empate en la mejor utilidad, guardamos ambas opciones
+            elif utilidad_actual == max_utilidad:
+                mejores_acciones.append(accion)
+
+        # Si hay más de un camino con el mismo puntaje máximo, elige uno al azar
+        if mejores_acciones:
+            return random.choice(mejores_acciones)
+
+        # Caso extremo por seguridad (nunca debería llegar aquí con una buena utilidad)
+        return 'abajo'
+    
